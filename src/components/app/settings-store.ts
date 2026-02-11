@@ -1,3 +1,3 @@
-// Compatibility shim for environments that resolve .ts before .tsx for extensionless imports.
-// The actual implementation lives in settings-store.tsx.
-export * from "./settings-store";
+// Compatibility shim: keep imports stable at "@/components/app/settings-store".
+// The actual implementation lives in settings-store-impl.tsx.
+export * from "./settings-store-impl";
