@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getDb } from 'lib/database'; // Changed to absolute import
+import { getDb } from '@/lib/database';
+
+type Example = { id: number; name: string; createdAt: string };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -8,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'GET') {
       // Handle GET requests to fetch examples
       // Access data directly from db.data
-      const examples = db.data?.examples || [];
+      const examples: Example[] = db.data?.examples ?? [];
       return res.status(200).json(examples);
     } else if (req.method === 'POST') {
       // Handle POST requests to create a new example
@@ -18,10 +20,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       // Generate a simple ID (lowdb doesn't auto-increment like SQL dbs)
-      const examples = db.data?.examples || [];
-      const newId = examples.length > 0 ? Math.max(...examples.map(e => e.id)) + 1 : 1;
+      const examples: Example[] = db.data?.examples ?? [];
+      const newId = examples.length > 0 ? Math.max(...examples.map((e) => e.id)) + 1 : 1;
 
-      const newExample = {
+      const newExample: Example = {
         id: newId,
         name,
         createdAt: new Date().toISOString(),
