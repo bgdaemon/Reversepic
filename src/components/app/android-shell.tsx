@@ -11,10 +11,12 @@ import {
   ShieldCheck,
   Globe,
   SlidersHorizontal,
+  Compass,
 } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Search", icon: ScanSearch },
+  { href: "/explore", label: "Explore", icon: Compass },
   { href: "/history", label: "History", icon: Clock },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -62,7 +64,7 @@ export function AndroidShell({ children }: { children: React.ReactNode }) {
 
       {/* Bottom navigation */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/92 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-        <div className="mx-auto grid w-full max-w-screen-sm grid-cols-3 gap-1 px-3 py-2">
+        <div className="mx-auto grid w-full max-w-screen-sm grid-cols-4 gap-1 px-2 py-2">
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname?.startsWith(href);
             return (
@@ -70,7 +72,7 @@ export function AndroidShell({ children }: { children: React.ReactNode }) {
                 key={href}
                 href={href}
                 className={cn(
-                  "group flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium transition",
+                  "group flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-medium transition",
                   active
                     ? "bg-[hsl(var(--brand-soft))] text-[hsl(var(--brand-strong))]"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -79,7 +81,7 @@ export function AndroidShell({ children }: { children: React.ReactNode }) {
               >
                 <div
                   className={cn(
-                    "flex h-9 w-14 items-center justify-center rounded-2xl transition",
+                    "flex h-9 w-full max-w-[68px] items-center justify-center rounded-2xl transition",
                     active
                       ? "bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))] shadow-sm"
                       : "bg-card text-muted-foreground group-hover:text-foreground"

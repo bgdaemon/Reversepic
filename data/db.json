@@ -1,0 +1,19 @@
+{
+  "examples": [],
+  "searches": [],
+  "settings": {
+    "reverseImage": {
+      "providers": {
+        "google": true,
+        "bing": true,
+        "yandex": true,
+        "tineye": true
+      },
+      "openInNewTab": true,
+      "saveToHistory": true,
+      "language": "en",
+      "country": "US",
+      "safeSearch": "off"
+    }
+  }
+}

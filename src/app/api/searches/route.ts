@@ -3,10 +3,11 @@ import { getDb } from "@/lib/database";
 
 export type SearchRecord = {
   id: string;
-  kind: "url" | "address" | "image" | "wiki";
+  kind: "url" | "address" | "image" | "wiki" | "email" | "crawl";
   query: string;
   createdAt: string;
   summary?: string;
+  label?: string;
 };
 
 export async function GET() {
@@ -28,6 +29,7 @@ export async function POST(req: Request) {
     query: String(body.query),
     createdAt: body.createdAt || new Date().toISOString(),
     summary: body.summary ? String(body.summary) : undefined,
+    label: body.label ? String(body.label) : undefined,
   };
 
   const db = await getDb();

@@ -9,10 +9,11 @@ interface DbSchema {
   examples: { id: number; name: string; createdAt: string }[];
   searches: {
     id: string;
-    kind: "url" | "address" | "image" | "wiki";
+    kind: "url" | "address" | "image" | "wiki" | "email" | "crawl";
     query: string;
     createdAt: string;
     summary?: string;
+    label?: string;
   }[];
   settings: {
     reverseImage: {
@@ -24,6 +25,12 @@ interface DbSchema {
       safeSearch: "off" | "moderate" | "strict";
     };
   };
+  uploads: {
+    id: string;
+    filename: string;
+    contentType: string;
+    createdAt: string;
+  }[];
   // Future: The AI will add new collections here based on user needs, e.g.,
   // myCustomData: { id: string; value: string }[];
 }
@@ -61,6 +68,7 @@ export async function getDb(): Promise<Low<DbSchema>> {
     dbInstance = new Low<DbSchema>(adapter, {
       examples: [],
       searches: [],
+      uploads: [],
       settings: {
         reverseImage: {
           providers: { google: true, bing: true, yandex: true, tineye: true },

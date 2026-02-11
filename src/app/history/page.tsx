@@ -8,14 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Clock, Trash2, Search, ExternalLink } from "lucide-react";
+import { Clock, Trash2, Search, ExternalLink, Tag } from "lucide-react";
 
 type SearchRecord = {
   id: string;
-  kind: "url" | "address" | "image" | "wiki";
+  kind: "url" | "address" | "image" | "wiki" | "email" | "crawl";
   query: string;
   createdAt: string;
   summary?: string;
+  label?: string;
 };
 
 async function loadHistory(): Promise<SearchRecord[]> {
@@ -35,7 +36,7 @@ export default function HistoryPage() {
       const data = await loadHistory();
       setItems(data);
     } catch {
-      toast.error("Couldn’t load history");
+      toast.error("Couldn't load history");
     } finally {
       setLoading(false);
     }
@@ -46,14 +47,14 @@ export default function HistoryPage() {
   }, [refresh]);
 
   const filtered = items.filter((it) => {
-    const hay = `${it.kind} ${it.query} ${it.summary ?? ""}`.toLowerCase();
+    const hay = `${it.kind} ${it.label ?? ""} ${it.query} ${it.summary ?? ""}`.toLowerCase();
     return hay.includes(q.toLowerCase());
   });
 
   const clearAll = async () => {
     const res = await fetch("/api/searches?all=1", { method: "DELETE" });
     if (!res.ok) {
-      toast.error("Couldn’t clear history");
+      toast.error("Couldn't clear history");
       return;
     }
     toast.success("History cleared");
@@ -63,7 +64,7 @@ export default function HistoryPage() {
   const deleteOne = async (id: string) => {
     const res = await fetch(`/api/searches?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     if (!res.ok) {
-      toast.error("Couldn’t delete entry");
+      toast.error("Couldn't delete entry");
       return;
     }
     setItems((prev) => prev.filter((x) => x.id !== id));
@@ -98,7 +99,7 @@ export default function HistoryPage() {
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Filter history…"
+            placeholder="Filter history by name, kind, or query…"
             className="h-12 rounded-2xl border-border/60 bg-background/60 pl-11 shadow-sm focus-visible:ring-[hsl(var(--brand))]"
           />
         </div>
@@ -123,6 +124,14 @@ export default function HistoryPage() {
                     {new Date(it.createdAt).toLocaleString()}
                   </span>
                 </div>
+
+                {it.label && (
+                  <div className="mt-2 flex items-center gap-2 text-sm font-semibold tracking-tight">
+                    <Tag className="h-4 w-4 text-[hsl(var(--brand-strong))]" />
+                    <span className="truncate">{it.label}</span>
+                  </div>
+                )}
+
                 <div className="mt-2 break-all text-sm font-medium">{it.query}</div>
                 {it.summary && <div className="mt-1 text-xs text-muted-foreground">{it.summary}</div>}
               </div>
@@ -146,7 +155,7 @@ export default function HistoryPage() {
             </div>
             <Separator className="my-3" />
             <div className="text-xs text-muted-foreground">
-              Tip: Save summaries in Settings to remember the filters you used.
+              Tip: Add a name before searching so you can find it later.
             </div>
           </Card>
         ))}
