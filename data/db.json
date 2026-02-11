@@ -1,6 +1,14 @@
 {
   "examples": [],
-  "searches": [],
+  "searches": [
+    {
+      "id": "78c9814c-a114-4bff-8403-c2680b0c75e6",
+      "kind": "email",
+      "query": "c.creech22@icloud.com",
+      "createdAt": "2026-02-11T08:18:50.767Z",
+      "summary": "Email/domain scan"
+    }
+  ],
   "settings": {
     "reverseImage": {
       "providers": {

@@ -72,7 +72,7 @@ export async function getDb(): Promise<Low<DbSchema>> {
       settings: {
         reverseImage: {
           providers: { google: true, bing: true, yandex: true, tineye: true },
-          openInNewTab: true,
+          openInNewTab: false,
           saveToHistory: true,
           language: "en",
           country: "US",

@@ -48,7 +48,8 @@ export const DEFAULT_REVERSE_IMAGE_SETTINGS: ReverseImageSettings = {
     yandex: true,
     tineye: true,
   },
-  openInNewTab: true,
+  // Default to staying inside the app (Results screen) instead of popping external tabs.
+  openInNewTab: false,
   saveToHistory: true,
   language: "en",
   country: "US",

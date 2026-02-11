@@ -112,11 +112,13 @@ export function ReverseImageForm() {
       return;
     }
 
+    // Land on in-app Results first. (Optionally open the first provider in Settings.)
+    router.push(`/results?${params.toString()}`);
+
     if (s.openInNewTab) {
       window.open(first.url, "_blank", "noopener,noreferrer");
     }
 
-    router.push(`/results?${params.toString()}`);
   };
 
   const onSubmit = async (values: Values) => {
