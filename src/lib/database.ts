@@ -7,6 +7,13 @@ import fs from 'fs'; // Used only for checking directory existence synchronously
 // The AI will extend this schema based on user's specific app requirements.
 interface DbSchema {
   examples: { id: number; name: string; createdAt: string }[];
+  searches: {
+    id: string;
+    kind: "url" | "address" | "image" | "wiki";
+    query: string;
+    createdAt: string;
+    summary?: string;
+  }[];
   // Future: The AI will add new collections here based on user needs, e.g.,
   // myCustomData: { id: string; value: string }[];
 }
@@ -41,7 +48,7 @@ export async function getDb(): Promise<Low<DbSchema>> {
 
     const adapter = new JSONFile<DbSchema>(DB_FULL_PATH);
     // Provide initial generic structure for the template
-    dbInstance = new Low<DbSchema>(adapter, { examples: [] });
+    dbInstance = new Low<DbSchema>(adapter, { examples: [], searches: [] });
 
     await dbInstance.read();
 
