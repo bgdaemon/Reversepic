@@ -14,17 +14,20 @@ function normalizeImageUrl(input: string) {
 
 const PROVIDER_IDS = ["google", "bing", "yandex", "tineye"] as const;
 
-function parseProviders(raw: string | null) {
-  const all = new Set(PROVIDER_IDS);
-  if (!raw) return [...all];
+type ProviderId = (typeof PROVIDER_IDS)[number];
+
+function parseProviders(raw: string | null): ProviderId[] {
+  if (!raw) return PROVIDER_IDS.slice();
+
   const set = new Set(
     raw
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean)
   );
+
   const filtered = PROVIDER_IDS.filter((id) => set.has(id));
-  return filtered.length ? filtered : [...all];
+  return filtered.length ? filtered : PROVIDER_IDS.slice();
 }
 
 function safeParam(raw: string | null): "off" | "moderate" | "strict" {
@@ -41,7 +44,7 @@ function normalizeLocale(raw: string | null, fallback: string) {
 
 function buildLinks(args: {
   imageUrl: string;
-  providers: (typeof PROVIDER_IDS)[number][];
+  providers: ProviderId[];
   lang: string;
   country: string;
   safe: "off" | "moderate" | "strict";
@@ -51,7 +54,7 @@ function buildLinks(args: {
   const safeBing = safe === "strict" ? "strict" : safe === "off" ? "off" : "moderate";
   const safeYandex = safe === "strict" ? 2 : safe === "off" ? 0 : 1;
 
-  const map: Record<(typeof PROVIDER_IDS)[number], { provider: string; url: string }> = {
+  const map: Record<ProviderId, { provider: string; url: string }> = {
     google: {
       provider: "Google Lens",
       url: `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(imageUrl)}&hl=${encodeURIComponent(lang)}`,
