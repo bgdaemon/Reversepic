@@ -12,6 +12,73 @@ function normalizeImageUrl(input: string) {
   }
 }
 
+const PROVIDER_IDS = ["google", "bing", "yandex", "tineye"] as const;
+
+function parseProviders(raw: string | null) {
+  const all = new Set(PROVIDER_IDS);
+  if (!raw) return [...all];
+  const set = new Set(
+    raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
+  const filtered = PROVIDER_IDS.filter((id) => set.has(id));
+  return filtered.length ? filtered : [...all];
+}
+
+function safeParam(raw: string | null): "off" | "moderate" | "strict" {
+  if (raw === "off" || raw === "moderate" || raw === "strict") return raw;
+  return "moderate";
+}
+
+function normalizeLocale(raw: string | null, fallback: string) {
+  const v = (raw ?? "").trim();
+  if (!v) return fallback;
+  if (v.length > 12) return fallback;
+  return v;
+}
+
+function buildLinks(args: {
+  imageUrl: string;
+  providers: (typeof PROVIDER_IDS)[number][];
+  lang: string;
+  country: string;
+  safe: "off" | "moderate" | "strict";
+}) {
+  const { imageUrl, providers, lang, country, safe } = args;
+
+  const safeBing = safe === "strict" ? "strict" : safe === "off" ? "off" : "moderate";
+  const safeYandex = safe === "strict" ? 2 : safe === "off" ? 0 : 1;
+
+  const map: Record<(typeof PROVIDER_IDS)[number], { provider: string; url: string }> = {
+    google: {
+      provider: "Google Lens",
+      url: `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(imageUrl)}&hl=${encodeURIComponent(lang)}`,
+    },
+    bing: {
+      provider: "Bing Visual Search",
+      url: `https://www.bing.com/images/search?q=imgurl:${encodeURIComponent(
+        imageUrl
+      )}&view=detailv2&iss=sbi&setlang=${encodeURIComponent(lang)}&cc=${encodeURIComponent(
+        country
+      )}&adlt=${encodeURIComponent(safeBing)}`,
+    },
+    yandex: {
+      provider: "Yandex Images",
+      url: `https://yandex.com/images/search?rpt=imageview&url=${encodeURIComponent(
+        imageUrl
+      )}&lang=${encodeURIComponent(lang)}&safe=${safeYandex}`,
+    },
+    tineye: {
+      provider: "TinEye",
+      url: `https://tineye.com/search?url=${encodeURIComponent(imageUrl)}`,
+    },
+  };
+
+  return providers.map((id) => map[id]);
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const imageUrlParam = searchParams.get("imageUrl") ?? "";
@@ -20,28 +87,18 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: "Invalid imageUrl" }, { status: 400 });
   }
 
-  // Important: truly "free" reverse image search at scale requires an external provider.
-  // Here we generate *links* to public reverse-image search UIs.
-  const links = [
-    {
-      provider: "Google Images",
-      url: `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(imageUrl.toString())}`,
-    },
-    {
-      provider: "Bing Visual Search",
-      url: `https://www.bing.com/images/search?q=imgurl:${encodeURIComponent(
-        imageUrl.toString()
-      )}&view=detailv2&iss=sbi`,
-    },
-    {
-      provider: "Yandex Images",
-      url: `https://yandex.com/images/search?rpt=imageview&url=${encodeURIComponent(imageUrl.toString())}`,
-    },
-    {
-      provider: "TinEye",
-      url: `https://tineye.com/search?url=${encodeURIComponent(imageUrl.toString())}`,
-    },
-  ];
+  const providers = parseProviders(searchParams.get("providers"));
+  const lang = normalizeLocale(searchParams.get("lang"), "en");
+  const country = normalizeLocale(searchParams.get("country"), "US");
+  const safe = safeParam(searchParams.get("safe"));
+
+  const links = buildLinks({
+    imageUrl: imageUrl.toString(),
+    providers,
+    lang,
+    country,
+    safe,
+  });
 
   return NextResponse.json({ imageUrl: imageUrl.toString(), links });
 }

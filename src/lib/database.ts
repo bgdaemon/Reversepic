@@ -14,6 +14,16 @@ interface DbSchema {
     createdAt: string;
     summary?: string;
   }[];
+  settings: {
+    reverseImage: {
+      providers: Record<"google" | "bing" | "yandex" | "tineye", boolean>;
+      openInNewTab: boolean;
+      saveToHistory: boolean;
+      language: string;
+      country: string;
+      safeSearch: "off" | "moderate" | "strict";
+    };
+  };
   // Future: The AI will add new collections here based on user needs, e.g.,
   // myCustomData: { id: string; value: string }[];
 }
@@ -48,7 +58,20 @@ export async function getDb(): Promise<Low<DbSchema>> {
 
     const adapter = new JSONFile<DbSchema>(DB_FULL_PATH);
     // Provide initial generic structure for the template
-    dbInstance = new Low<DbSchema>(adapter, { examples: [], searches: [] });
+    dbInstance = new Low<DbSchema>(adapter, {
+      examples: [],
+      searches: [],
+      settings: {
+        reverseImage: {
+          providers: { google: true, bing: true, yandex: true, tineye: true },
+          openInNewTab: true,
+          saveToHistory: true,
+          language: "en",
+          country: "US",
+          safeSearch: "moderate",
+        },
+      },
+    });
 
     await dbInstance.read();
 

@@ -1,12 +1,24 @@
-import { MadeWithDyad } from "@/components/made-with-dyad";
+import { ReverseImageForm } from "@/components/app/reverse-image-form";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-1 items-center sm:items-start">
-        <h1>Blank page</h1>
-      </main>
-      <MadeWithDyad />
+    <div className="space-y-4">
+      <ReverseImageForm />
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-3xl border border-border/60 bg-card p-4 text-sm shadow-sm">
+          <div className="font-semibold tracking-tight">Layer 1: Search</div>
+          <div className="mt-1 text-muted-foreground">
+            Paste an image URL and jump into provider results.
+          </div>
+        </div>
+        <div className="rounded-3xl border border-border/60 bg-card p-4 text-sm shadow-sm">
+          <div className="font-semibold tracking-tight">Layer 2: Tune</div>
+          <div className="mt-1 text-muted-foreground">
+            Use Settings to narrow providers, locale, and safe-search behavior.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
