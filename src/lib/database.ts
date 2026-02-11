@@ -40,6 +40,22 @@ const DB_FILE_NAME = 'db.json';
 const DB_DIR_PATH = process.env.DATABASE_DIR || './data'; // Allows configuring DB directory via env
 const DB_FULL_PATH = path.resolve(process.cwd(), DB_DIR_PATH, DB_FILE_NAME);
 
+const DEFAULT_DB_DATA: DbSchema = {
+  examples: [],
+  searches: [],
+  uploads: [],
+  settings: {
+    reverseImage: {
+      providers: { google: true, bing: true, yandex: true, tineye: true },
+      openInNewTab: false,
+      saveToHistory: true,
+      language: "en",
+      country: "US",
+      safeSearch: "moderate",
+    },
+  },
+};
+
 let dbInstance: Low<DbSchema> | null = null;
 
 /**
@@ -64,24 +80,16 @@ export async function getDb(): Promise<Low<DbSchema>> {
     }
 
     const adapter = new JSONFile<DbSchema>(DB_FULL_PATH);
-    // Provide initial generic structure for the template
-    dbInstance = new Low<DbSchema>(adapter, {
-      examples: [],
-      searches: [],
-      uploads: [],
-      settings: {
-        reverseImage: {
-          providers: { google: true, bing: true, yandex: true, tineye: true },
-          openInNewTab: false,
-          saveToHistory: true,
-          language: "en",
-          country: "US",
-          safeSearch: "moderate",
-        },
-      },
-    });
+    dbInstance = new Low<DbSchema>(adapter, DEFAULT_DB_DATA);
 
     await dbInstance.read();
+
+    // If the file doesn't exist yet (or is empty), ensure we start from a clean,
+    // non-sensitive baseline and persist it to disk.
+    if (!dbInstance.data) {
+      dbInstance.data = DEFAULT_DB_DATA;
+      await dbInstance.write();
+    }
 
     console.log(`Database initialized/loaded from: ${DB_FULL_PATH}`);
 
